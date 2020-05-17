@@ -23,12 +23,16 @@ import android.widget.ImageView.ScaleType.FIT_END
 import android.widget.ImageView.ScaleType.FIT_START
 import androidx.core.view.ViewCompat
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
+import coil.ComponentRegistry
 import coil.base.R
 import coil.decode.DataSource
+import coil.map.Mapper
+import coil.map.MeasuredMapper
 import coil.memory.MemoryCache
 import coil.memory.ViewTargetRequestManager
 import coil.request.Parameters
 import coil.size.Scale
+import coil.size.Size
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Headers
@@ -54,9 +58,7 @@ internal inline val StatFs.blockCountCompat: Long
 internal inline val StatFs.blockSizeCompat: Long
     get() = if (SDK_INT > 18) blockSizeLong else blockSize.toLong()
 
-internal fun MemoryCache.getValue(key: MemoryCache.Key?): MemoryCache.Value? = key?.let(::get)
-
-internal fun MemoryCache.putValue(key: MemoryCache.Key?, value: Drawable, isSampled: Boolean) {
+internal fun MemoryCache.set(key: MemoryCache.Key?, value: Drawable, isSampled: Boolean) {
     if (key != null) {
         val bitmap = (value as? BitmapDrawable)?.bitmap
         if (bitmap != null) {
@@ -163,5 +165,26 @@ internal fun Parameters?.orEmpty() = this ?: Parameters.EMPTY
 
 internal fun isMainThread() = Looper.myLooper() == Looper.getMainLooper()
 
+internal fun assertMainThread() {
+    check(isMainThread()) { "This method can only be called from the main thread." }
+}
+
 internal inline val Any.identityHashCode: Int
     get() = System.identityHashCode(this)
+
+/** Map [data] using the components registered in this [ComponentRegistry]. */
+@Suppress("UNCHECKED_CAST")
+internal inline fun ComponentRegistry.mapData(data: Any, size: (MeasuredMapper<*, *>) -> Size): Any {
+    var mappedData = data
+    measuredMappers.forEachIndices { (type, mapper) ->
+        if (type.isAssignableFrom(mappedData::class.java) && (mapper as MeasuredMapper<Any, *>).handles(mappedData)) {
+            mappedData = mapper.map(mappedData, size(mapper))
+        }
+    }
+    mappers.forEachIndices { (type, mapper) ->
+        if (type.isAssignableFrom(mappedData::class.java) && (mapper as Mapper<Any, *>).handles(mappedData)) {
+            mappedData = mapper.map(mappedData)
+        }
+    }
+    return mappedData
+}
