@@ -3,7 +3,7 @@ package coil.memory
 import android.content.Context
 import androidx.collection.arraySetOf
 import androidx.test.core.app.ApplicationProvider
-import coil.memory.MemoryCache.Key
+import coil.memory.StrongMemoryCache.Key
 import coil.util.clear
 import coil.util.count
 import coil.util.createBitmap

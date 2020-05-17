@@ -2,6 +2,8 @@ package coil.memory
 
 import android.util.Log
 import coil.decode.DecodeUtils
+import coil.memory.StrongMemoryCache.Key
+import coil.memory.StrongMemoryCache.Value
 import coil.request.Request
 import coil.size.OriginalSize
 import coil.size.PixelSize
@@ -13,7 +15,7 @@ import coil.util.log
 import coil.util.safeConfig
 import kotlin.math.abs
 
-/** Handles operations related to the [MemoryCache]. */
+/** Handles operations related to the memory cache. */
 internal class MemoryCacheService(
     private val requestService: RequestService,
     private val logger: Logger?
@@ -25,8 +27,8 @@ internal class MemoryCacheService(
 
     /** Return true if [cacheValue] satisfies the [request]. */
     fun isCachedValueValid(
-        cacheKey: MemoryCache.Key?,
-        cacheValue: MemoryCache.Value,
+        cacheKey: Key?,
+        cacheValue: Value,
         request: Request,
         sizeResolver: SizeResolver,
         size: Size,
@@ -51,8 +53,8 @@ internal class MemoryCacheService(
 
     /** Return true if [cacheValue]'s size satisfies the [request]. */
     private fun isSizeValid(
-        cacheKey: MemoryCache.Key?,
-        cacheValue: MemoryCache.Value,
+        cacheKey: Key?,
+        cacheValue: Value,
         request: Request,
         sizeResolver: SizeResolver,
         size: Size,
