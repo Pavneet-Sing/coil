@@ -33,6 +33,7 @@ import coil.map.StringMapper
 import coil.memory.BitmapReferenceCounter
 import coil.memory.DelegateService
 import coil.memory.MemoryCacheService
+import coil.memory.RealMemoryCache
 import coil.memory.RequestService
 import coil.memory.StrongMemoryCache
 import coil.memory.TargetDelegate
@@ -60,7 +61,6 @@ import coil.util.closeQuietly
 import coil.util.emoji
 import coil.util.firstNotNullIndices
 import coil.util.foldIndices
-import coil.util.get
 import coil.util.log
 import coil.util.mapData
 import coil.util.placeholderOrDefault
@@ -109,6 +109,8 @@ internal class RealImageLoader(
     private val memoryCacheService = MemoryCacheService(requestService, logger)
     private val drawableDecoder = DrawableDecoderService(bitmapPool)
     private val systemCallbacks = SystemCallbacks(this, context)
+
+    override val memoryCache = RealMemoryCache(registry, strongMemoryCache, weakMemoryCache, referenceCounter)
 
     private val registry = registry.newBuilder()
         // Mappers

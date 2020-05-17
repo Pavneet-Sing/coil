@@ -1,5 +1,3 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package coil.memory
 
 import android.content.ComponentCallbacks2
@@ -65,15 +63,14 @@ internal object EmptyWeakMemoryCache : WeakMemoryCache {
     override fun trimMemory(level: Int) {}
 }
 
-/** A [WeakMemoryCache] implementation backed by a [HashMap]. */
+/** A [WeakMemoryCache] implementation backed by a [MutableMap]. */
 internal class RealWeakMemoryCache : WeakMemoryCache {
 
     companion object {
         private const val CLEAN_UP_INTERVAL = 10
     }
 
-    @VisibleForTesting internal val cache = HashMap<Key, ArrayList<WeakValue>>()
-
+    @VisibleForTesting internal val cache = mutableMapOf<Key, ArrayList<WeakValue>>()
     @VisibleForTesting internal var operationsSinceCleanUp = 0
 
     override fun get(key: Key): Value? {
